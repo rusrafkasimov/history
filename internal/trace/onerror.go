@@ -15,6 +15,16 @@ import (
 	"io"
 )
 
+func MakeSpan(ctx context.Context, tracer opentracing.Tracer, opnName string, opts ...opentracing.StartSpanOption) opentracing.Span {
+	if parentSpan := opentracing.SpanFromContext(ctx); parentSpan != nil {
+		opts = append(opts, opentracing.ChildOf(parentSpan.Context()))
+	}
+
+	span := tracer.StartSpan(opnName, opts...)
+
+	return span
+}
+
 func OnError(logger promtail.Client, span opentracing.Span, err error) {
 	if span != nil {
 		span.SetTag(string(ext.Error), true)

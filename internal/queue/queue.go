@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/DesoTTo/p1-acc-history/internal/config"
-	"github.com/DesoTTo/p1-acc-history/internal/trace"
-	"github.com/DesoTTo/p1-acc-history/pkg/dto"
 	"github.com/afiskon/promtail-client/promtail"
 	"github.com/go-kit/kit/sd/lb"
 	"github.com/nats-io/stan.go"
+	"github.com/rusrafkasimov/history/internal/config"
+	"github.com/rusrafkasimov/history/internal/trace"
+	"github.com/rusrafkasimov/history/pkg/dto"
 	"sync"
 	"time"
 )
@@ -111,7 +111,7 @@ func NewQueue(ctx context.Context, logger promtail.Client, config *config.Config
 	err = q.connect()
 	if err != nil {
 		q.logger.Errorf("error first connection to NATS. trying dial background...")
-		trace.OnError(nil, err)
+		trace.OnError(q.logger,nil, err)
 		q.dialBackground()
 	}
 
@@ -137,7 +137,7 @@ func (q *Queue) dialBackground() {
 				err := q.connect()
 				if err != nil {
 					q.logger.Errorf("Error background connection NATS_Streaming")
-					trace.OnError(nil, err)
+					trace.OnError(q.logger,nil, err)
 					continue
 				}
 				return
@@ -221,7 +221,7 @@ func (q *Queue) handleMessage(msg *stan.Msg) {
 	err := json.Unmarshal(msg.Data, history)
 	if err != nil {
 		q.logger.Errorf("Can't unmarshall message")
-		trace.OnError(nil, err)
+		trace.OnError(q.logger,nil, err)
 		return
 	}
 
