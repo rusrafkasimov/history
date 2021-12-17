@@ -7,13 +7,13 @@ import (
 	"github.com/rusrafkasimov/history/internal/trace"
 	"github.com/rusrafkasimov/history/pkg/dto"
 	"github.com/rusrafkasimov/history/pkg/usecases"
-	history_proto "github.com/rusrafkasimov/history/proto"
+	"github.com/rusrafkasimov/history/proto"
 )
 
 type RPCHistoryController struct {
 	logger    promtail.Client
 	historyUC usecases.HistoryUseCases
-	history_proto.UnimplementedOperationHistoryServer
+	operation_history.UnimplementedOperationHistoryServer
 }
 
 func NewRPCHistoryController(service usecases.HistoryUseCases, logger promtail.Client) *RPCHistoryController {
@@ -23,7 +23,8 @@ func NewRPCHistoryController(service usecases.HistoryUseCases, logger promtail.C
 	}
 }
 
-func (h *RPCHistoryController) CreateHistory(ctx context.Context, request *history_proto.OperationHistoryRequest) (*history_proto.OperationHistoryResponse, error) {
+
+func (h *RPCHistoryController) CreateHistory(ctx context.Context, request *operation_history.OperationHistoryRequest) (*operation_history.OperationHistoryResponse, error) {
 	tracer := opentracing.GlobalTracer()
 	controllerSpan := tracer.StartSpan("Controller:CreateHistory")
 	defer controllerSpan.Finish()
@@ -48,13 +49,13 @@ func (h *RPCHistoryController) CreateHistory(ctx context.Context, request *histo
 	err := h.historyUC.AddHistoryToQueue(ctx, history, controllerSpan)
 	if err != nil {
 		trace.OnError(h.logger, controllerSpan, err)
-		return &history_proto.OperationHistoryResponse{
+		return &operation_history.OperationHistoryResponse{
 			ServerCode:    400,
 			ServerMessage: err.Error(),
 		}, err
 	}
 
-	return &history_proto.OperationHistoryResponse{
+	return &operation_history.OperationHistoryResponse{
 		ServerCode:    200,
 		ServerMessage: "Ok",
 	}, nil
