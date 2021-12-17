@@ -2,12 +2,13 @@ package usecases
 
 import (
 	"context"
-	"fmt"
 	"github.com/afiskon/promtail-client/promtail"
 	"github.com/opentracing/opentracing-go"
 	"github.com/rusrafkasimov/history/internal/convert"
+	"github.com/rusrafkasimov/history/internal/errs"
 	"github.com/rusrafkasimov/history/internal/queue"
 	"github.com/rusrafkasimov/history/internal/trace"
+	"github.com/rusrafkasimov/history/internal/types"
 	"github.com/rusrafkasimov/history/pkg/dto"
 	"github.com/rusrafkasimov/history/pkg/repository"
 	"github.com/satori/go.uuid"
@@ -20,11 +21,11 @@ type EventQueue interface {
 }
 
 type HistoryUseCases interface {
-	AddHistoryToQueue(ctx context.Context, history dto.AccountHistory, span opentracing.Span) error
-	RecordAccountHistory(ctx context.Context, history dto.AccountHistory, span opentracing.Span) (dto.AccountHistory, error)
-	GetAccountHistoryByID(ctx context.Context, id string, span opentracing.Span) (dto.AccountHistory, error)
-	GetAccountHistoryByOperationID(ctx context.Context, opId string, span opentracing.Span) ([]dto.AccountHistory, error)
-	GetAccountHistoryByClientID(ctx context.Context, cId string, span opentracing.Span) ([]dto.AccountHistory, error)
+	AddHistoryToQueue(ctx context.Context, history dto.AccountHistory, span opentracing.Span) types.ErrorWithCode
+	RecordAccountHistory(ctx context.Context, history dto.AccountHistory, span opentracing.Span) (dto.AccountHistory, types.ErrorWithCode)
+	GetAccountHistoryByID(ctx context.Context, id string, span opentracing.Span) (dto.AccountHistory, types.ErrorWithCode)
+	GetAccountHistoryByOperationID(ctx context.Context, opId string, span opentracing.Span) ([]dto.AccountHistory, types.ErrorWithCode)
+	GetAccountHistoryByClientID(ctx context.Context, cId string, span opentracing.Span) ([]dto.AccountHistory, types.ErrorWithCode)
 }
 
 type HistoryUC struct {
@@ -42,7 +43,7 @@ func NewAccountOperationUseCases(queue EventQueue, history repository.HistoryRep
 }
 
 // AddHistoryToQueue is example queue function, not for release version. Event publication must be initialized from another service
-func (h *HistoryUC) AddHistoryToQueue(ctx context.Context, history dto.AccountHistory, span opentracing.Span) error {
+func (h *HistoryUC) AddHistoryToQueue(ctx context.Context, history dto.AccountHistory, span opentracing.Span) types.ErrorWithCode {
 	tracer := opentracing.GlobalTracer()
 	useCaseSpan := tracer.StartSpan("UCase:AddHistoryToQueue", opentracing.ChildOf(span.Context()))
 	defer func() {
@@ -53,20 +54,20 @@ func (h *HistoryUC) AddHistoryToQueue(ctx context.Context, history dto.AccountHi
 	err := h.queue.Publish(history)
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return err
+		return errs.NewInternalServerError(err.Error())
 	}
 
 	return nil
 }
 
-func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.AccountHistory, span opentracing.Span) (dto.AccountHistory, error) {
+func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.AccountHistory, span opentracing.Span) (dto.AccountHistory, types.ErrorWithCode) {
 	tracer := opentracing.GlobalTracer()
 	useCaseSpan := tracer.StartSpan("UCase:RecordAccountHistory", opentracing.ChildOf(span.Context()))
 	defer useCaseSpan.Finish()
 
 	historyModel, errConv := convert.AccountHistoryDto(history)
 	if errConv != nil {
-		return dto.AccountHistory{}, errConv
+		return history, errs.NewBadRequestError(errConv.Error())
 	}
 
 	historyModel.ID = uuid.NewV4()
@@ -76,7 +77,7 @@ func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.Accoun
 	err := h.accHist.CreateAccountHistory(ctx, historyModel, span)
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return dto.AccountHistory{}, err
+		return history, errs.NewInternalServerError(err.Error())
 	}
 
 	historyDto := convert.AccountHistoryModel(historyModel)
@@ -84,7 +85,7 @@ func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.Accoun
 	return historyDto, nil
 }
 
-func (h *HistoryUC) GetAccountHistoryByID(ctx context.Context, id string, span opentracing.Span) (dto.AccountHistory, error) {
+func (h *HistoryUC) GetAccountHistoryByID(ctx context.Context, id string, span opentracing.Span) (dto.AccountHistory, types.ErrorWithCode) {
 	tracer := opentracing.GlobalTracer()
 	useCaseSpan := tracer.StartSpan("UCase:GetAccountHistoryByID", opentracing.ChildOf(span.Context()))
 	defer useCaseSpan.Finish()
@@ -92,7 +93,7 @@ func (h *HistoryUC) GetAccountHistoryByID(ctx context.Context, id string, span o
 	historyModel, err := h.accHist.GetAccountHistoryByID(ctx, id, span)
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return dto.AccountHistory{}, err
+		return dto.AccountHistory{}, errs.NewInternalServerError(err.Error())
 	}
 
 	historyDto := convert.AccountHistoryModel(historyModel)
@@ -100,7 +101,7 @@ func (h *HistoryUC) GetAccountHistoryByID(ctx context.Context, id string, span o
 	return historyDto, nil
 }
 
-func (h *HistoryUC) GetAccountHistoryByOperationID(ctx context.Context, opId string, span opentracing.Span) ([]dto.AccountHistory, error) {
+func (h *HistoryUC) GetAccountHistoryByOperationID(ctx context.Context, opId string, span opentracing.Span) ([]dto.AccountHistory, types.ErrorWithCode) {
 	tracer := opentracing.GlobalTracer()
 	useCaseSpan := tracer.StartSpan("UCase:GetAccountHistoryByOperationID", opentracing.ChildOf(span.Context()))
 	defer useCaseSpan.Finish()
@@ -109,7 +110,7 @@ func (h *HistoryUC) GetAccountHistoryByOperationID(ctx context.Context, opId str
 	historyModels, err := h.accHist.GetAccountHistoryByOperationID(ctx, opId, span)
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return result, err
+		return result, errs.NewInternalServerError(err.Error())
 	}
 
 	for _, model := range historyModels {
@@ -120,7 +121,7 @@ func (h *HistoryUC) GetAccountHistoryByOperationID(ctx context.Context, opId str
 	return result, nil
 }
 
-func (h *HistoryUC) GetAccountHistoryByClientID(ctx context.Context, cId string, span opentracing.Span) ([]dto.AccountHistory, error) {
+func (h *HistoryUC) GetAccountHistoryByClientID(ctx context.Context, cId string, span opentracing.Span) ([]dto.AccountHistory, types.ErrorWithCode) {
 	tracer := opentracing.GlobalTracer()
 	useCaseSpan := tracer.StartSpan("UCase:GetAccountHistoryByClientID", opentracing.ChildOf(span.Context()))
 	defer useCaseSpan.Finish()
@@ -130,7 +131,7 @@ func (h *HistoryUC) GetAccountHistoryByClientID(ctx context.Context, cId string,
 	historyModels, err := h.accHist.GetAccountHistoryByClientID(ctx, cId, span)
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return []dto.AccountHistory{}, err
+		return []dto.AccountHistory{}, errs.NewInternalServerError(err.Error())
 	}
 
 	for _, model := range historyModels {
@@ -141,13 +142,13 @@ func (h *HistoryUC) GetAccountHistoryByClientID(ctx context.Context, cId string,
 	return result, nil
 }
 
-func (h *HistoryUC) SubscribeOnEvents(ctx context.Context) (<-chan queue.Event, error) {
+func (h *HistoryUC) SubscribeOnEvents(ctx context.Context) (<-chan queue.Event, types.ErrorWithCode) {
 	span := trace.MakeSpan(ctx, opentracing.GlobalTracer(), "SubscribeOnEvents")
 	defer span.Finish()
 	eventCh, err := h.queue.Subscribe()
 	if err != nil {
 		trace.OnError(h.logger, span, err)
-		return nil, err
+		return nil, errs.NewInternalServerError(err.Error())
 	}
 	return eventCh, nil
 }
@@ -162,7 +163,7 @@ func (h *HistoryUC) RunReceiveEventsLoop(ctx context.Context, eventCh <-chan que
 				if !ok {
 					return
 				}
-				fmt.Println(event.Operation().OperationCode)
+				h.logger.Infof("%v", event.Operation().OperationCode)
 
 				_, err := h.RecordAccountHistory(ctx, event.Operation(), span)
 				if err != nil {
