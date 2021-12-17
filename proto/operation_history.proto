@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "v1/operation_history";
+
+package proto_operation_history;
+
+message OperationHistoryResponse {
+  int32 ServerCode = 1;
+  string ServerMessage = 2;
+}
+
+message OperationHistoryRequest {
+  string OperationId = 1;
+  string ClientId = 2;
+  int32 AccountType = 3;
+  int32 OperationCode = 4;
+  string OperationDesc = 5;
+  int32 TransactionCode = 6;
+  string TransactionDesc = 7;
+  string Comment = 8;
+  int32 State = 9;
+  string StateDesc = 10;
+  int64 ScoreSum = 11;
+  uint64 AvailableBalance = 12;
+  int64 TransactionSum = 13;
+  string TransactionTimestamp = 14;
+}
+
+service OperationHistory {
+  rpc CreateHistory(OperationHistoryRequest) returns (OperationHistoryResponse);
+}
