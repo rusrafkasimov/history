@@ -1,0 +1,223 @@
+basePath: /
+definitions:
+  AccountHistory:
+    properties:
+      account_type:
+        type: integer
+      archived_at:
+        type: string
+      available_balance:
+        type: integer
+      client_id:
+        type: string
+      comment:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      operation_code:
+        type: integer
+      operation_desc:
+        type: string
+      operation_id:
+        type: string
+      score_sum:
+        type: integer
+      state:
+        type: integer
+      state_desc:
+        type: string
+      transaction_code:
+        type: integer
+      transaction_desc:
+        type: string
+      transaction_sum:
+        type: integer
+      transaction_timestamp:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  Error:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: 127.0.0.1:8091
+info:
+  contact:
+    name: Ruslan Kasimov
+  description: Account History Microservice (Golang)
+  title: Swagger Account History Service
+  version: "0.1"
+paths:
+  /acc_history:
+    post:
+      description: Get JSON AccountHistory, return created JSON AccountHistory
+      parameters:
+      - description: AccountHistory
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/AccountHistory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AccountHistory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - TokenJWT: []
+      summary: Create history
+      tags:
+      - History
+  /acc_history/{id}:
+    get:
+      description: Get id from param, return JSON AccountHistory
+      parameters:
+      - description: AccountHistory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AccountHistory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - TokenJWT: []
+      summary: Get history by ID
+      tags:
+      - History
+  /acc_history_client/{id}:
+    get:
+      description: Get id from param, return JSON AccountHistory
+      parameters:
+      - description: AccountHistory ClientID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/AccountHistory'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - TokenJWT: []
+      summary: Get history by client ID
+      tags:
+      - History
+  /acc_history_opn/{id}:
+    get:
+      description: Get id from param, return JSON AccountHistory
+      parameters:
+      - description: AccountHistory OperationID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/AccountHistory'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - TokenJWT: []
+      summary: Get history by operation ID
+      tags:
+      - History
+  /health:
+    get:
+      description: Return answer from server for checking what server is stay alive
+      operationId: health-check
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Health check
+      tags:
+      - system
+  /ping:
+    get:
+      description: Just ping-pong endpoint, can be used as health indicator
+      operationId: ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Ping
+      tags:
+      - testing
+securityDefinitions:
+  TokenJWT:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

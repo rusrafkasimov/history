@@ -20,4 +20,4 @@ type AccountHistory struct {
 	UpdatedAt            string `json:"updated_at"`
 	ArchivedAt           string `json:"archived_at"`
 	DeletedAt            string `json:"deleted_at"`
-}
+} // @Name AccountHistory

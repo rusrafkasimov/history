@@ -1,0 +1,346 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Account History Microservice (Golang)",
+        "title": "Swagger Account History Service",
+        "contact": {
+            "name": "Ruslan Kasimov"
+        },
+        "version": "0.1"
+    },
+    "host": "127.0.0.1:8091",
+    "basePath": "/",
+    "paths": {
+        "/acc_history": {
+            "post": {
+                "security": [
+                    {
+                        "TokenJWT": []
+                    }
+                ],
+                "description": "Get JSON AccountHistory, return created JSON AccountHistory",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History"
+                ],
+                "summary": "Create history",
+                "parameters": [
+                    {
+                        "description": "AccountHistory",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AccountHistory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AccountHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/acc_history/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "TokenJWT": []
+                    }
+                ],
+                "description": "Get id from param, return JSON AccountHistory",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History"
+                ],
+                "summary": "Get history by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "AccountHistory ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AccountHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/acc_history_client/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "TokenJWT": []
+                    }
+                ],
+                "description": "Get id from param, return JSON AccountHistory",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History"
+                ],
+                "summary": "Get history by client ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "AccountHistory ClientID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AccountHistory"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/acc_history_opn/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "TokenJWT": []
+                    }
+                ],
+                "description": "Get id from param, return JSON AccountHistory",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "History"
+                ],
+                "summary": "Get history by operation ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "AccountHistory OperationID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AccountHistory"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Return answer from server for checking what server is stay alive",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Health check",
+                "operationId": "health-check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "Just ping-pong endpoint, can be used as health indicator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "testing"
+                ],
+                "summary": "Ping",
+                "operationId": "ping",
+                "responses": {
+                    "200": {
+                        "description": "pong",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AccountHistory": {
+            "type": "object",
+            "properties": {
+                "account_type": {
+                    "type": "integer"
+                },
+                "archived_at": {
+                    "type": "string"
+                },
+                "available_balance": {
+                    "type": "integer"
+                },
+                "client_id": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "operation_code": {
+                    "type": "integer"
+                },
+                "operation_desc": {
+                    "type": "string"
+                },
+                "operation_id": {
+                    "type": "string"
+                },
+                "score_sum": {
+                    "type": "integer"
+                },
+                "state": {
+                    "type": "integer"
+                },
+                "state_desc": {
+                    "type": "string"
+                },
+                "transaction_code": {
+                    "type": "integer"
+                },
+                "transaction_desc": {
+                    "type": "string"
+                },
+                "transaction_sum": {
+                    "type": "integer"
+                },
+                "transaction_timestamp": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "TokenJWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

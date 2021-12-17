@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+// @title Swagger Account History Service
+// @version 0.1
+// @description Account History Microservice (Golang)
+
+// @contact.name Ruslan Kasimov
+
+// @host 127.0.0.1:8091
+// @BasePath /
+
+// @securityDefinitions.apikey TokenJWT
+// @in header
+// @name Authorization
+
 const (
 	Name           = "History"
 	contextKeyName = "Name"

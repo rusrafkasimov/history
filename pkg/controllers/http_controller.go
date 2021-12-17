@@ -41,8 +41,8 @@ func NewAccOperationController(service usecases.HistoryUseCases, logger promtail
 // @Security TokenJWT
 // @Param data body dto.AccountHistory true "AccountHistory"
 // @Success 200 {object} dto.AccountHistory
-// @Failure 400 {string} Invalid JSON or AccountHistory not Valid
-// @Failure 500 {string} Can't create AccountHistory in DB
+// @Failure 400 {object} dto.Error Invalid JSON or AccountHistory not Valid
+// @Failure 500 {object} dto.Error Can't create AccountHistory in DB
 // @Router /acc_history [post]
 func (hst *HistoryController) CreateHistory(c *gin.Context) {
 	tracer := opentracing.GlobalTracer()
@@ -79,8 +79,8 @@ func (hst *HistoryController) CreateHistory(c *gin.Context) {
 // @Security TokenJWT
 // @Param id path int true "AccountHistory ID"
 // @Success 200 {object} dto.AccountHistory
-// @Failure 400 {string} Invalid JSON or AccountHistory not Valid
-// @Failure 500 {string} Can't create AccountHistory in DB
+// @Failure 400 {object} dto.Error Invalid JSON or AccountHistory not Valid
+// @Failure 500 {object} dto.Error Can't create AccountHistory in DB
 // @Router /acc_history/{id} [get]
 func (hst *HistoryController) GetHistoryByID(c *gin.Context) {
 	tracer := opentracing.GlobalTracer()
@@ -114,8 +114,8 @@ func (hst *HistoryController) GetHistoryByID(c *gin.Context) {
 // @Security TokenJWT
 // @Param id path int true "AccountHistory OperationID"
 // @Success 200 {array} dto.AccountHistory
-// @Failure 400 {string} Invalid JSON or AccountHistory not Valid
-// @Failure 500 {string} Can't create AccountHistory in DB
+// @Failure 400 {object} dto.Error Invalid JSON or AccountHistory not Valid
+// @Failure 500 {object} dto.Error Can't create AccountHistory in DB
 // @Router /acc_history_opn/{id} [get]
 func (hst *HistoryController) GetHistoryByOpnID(c *gin.Context) {
 	tracer := opentracing.GlobalTracer()
@@ -150,8 +150,8 @@ func (hst *HistoryController) GetHistoryByOpnID(c *gin.Context) {
 // @Security TokenJWT
 // @Param id path int true "AccountHistory ClientID"
 // @Success 200 {array} dto.AccountHistory
-// @Failure 400 {string} Invalid JSON or AccountHistory not Valid
-// @Failure 500 {string} Can't create AccountHistory in DB
+// @Failure 400 {object} dto.Error Invalid JSON or AccountHistory not Valid
+// @Failure 500 {object} dto.Error Can't create AccountHistory in DB
 // @Router /acc_history_client/{id} [get]
 func (hst *HistoryController) GetHistoryByClientID(c *gin.Context) {
 	tracer := opentracing.GlobalTracer()
