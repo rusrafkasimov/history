@@ -1,0 +1,5 @@
+.env.local
+Dockerfile
+.gitignore
+docs
+.idea
