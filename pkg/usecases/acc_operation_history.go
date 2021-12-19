@@ -53,7 +53,7 @@ func (h *HistoryUC) AddHistoryToQueue(ctx context.Context, history dto.AccountHi
 
 	err := h.queue.Publish(history)
 	if err != nil {
-		trace.OnError(h.logger, span, err)
+		trace.OnError(h.logger, useCaseSpan, err)
 		return errs.NewInternalServerError(err.Error())
 	}
 
@@ -67,6 +67,7 @@ func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.Accoun
 
 	historyModel, errConv := convert.AccountHistoryDto(history)
 	if errConv != nil {
+		trace.OnError(h.logger, useCaseSpan, errConv)
 		return history, errs.NewBadRequestError(errConv.Error())
 	}
 
@@ -76,7 +77,7 @@ func (h *HistoryUC) RecordAccountHistory(ctx context.Context, history dto.Accoun
 
 	err := h.accHist.CreateAccountHistory(ctx, historyModel, span)
 	if err != nil {
-		trace.OnError(h.logger, span, err)
+		trace.OnError(h.logger, useCaseSpan, err)
 		return history, errs.NewInternalServerError(err.Error())
 	}
 
@@ -92,7 +93,7 @@ func (h *HistoryUC) GetAccountHistoryByID(ctx context.Context, id string, span o
 
 	historyModel, err := h.accHist.GetAccountHistoryByID(ctx, id, span)
 	if err != nil {
-		trace.OnError(h.logger, span, err)
+		trace.OnError(h.logger, useCaseSpan, err)
 		return dto.AccountHistory{}, errs.NewInternalServerError(err.Error())
 	}
 
@@ -109,7 +110,7 @@ func (h *HistoryUC) GetAccountHistoryByOperationID(ctx context.Context, opId str
 
 	historyModels, err := h.accHist.GetAccountHistoryByOperationID(ctx, opId, span)
 	if err != nil {
-		trace.OnError(h.logger, span, err)
+		trace.OnError(h.logger, useCaseSpan, err)
 		return result, errs.NewInternalServerError(err.Error())
 	}
 
@@ -130,7 +131,7 @@ func (h *HistoryUC) GetAccountHistoryByClientID(ctx context.Context, cId string,
 
 	historyModels, err := h.accHist.GetAccountHistoryByClientID(ctx, cId, span)
 	if err != nil {
-		trace.OnError(h.logger, span, err)
+		trace.OnError(h.logger, useCaseSpan, err)
 		return []dto.AccountHistory{}, errs.NewInternalServerError(err.Error())
 	}
 

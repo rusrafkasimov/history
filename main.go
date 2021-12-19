@@ -95,7 +95,7 @@ func main() {
 	// ch_database.MigrateHistoryModels(chDB)
 
 	// Build context
-	repoCtx := router.BuildRepositoryContext(chDB)
+	repoCtx := router.BuildRepositoryContext(chDB, loki)
 	ucCtx := router.BuildUseCaseContext(newQueue, repoCtx, loki)
 	appCtx := router.BuildApplicationContext(ucCtx, loki)
 

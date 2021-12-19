@@ -22,9 +22,9 @@ type ApplicationContext struct {
 	RPCHistoryController *controllers.RPCHistoryController
 }
 
-func BuildRepositoryContext(db *gorm.DB) *RepositoryContext {
+func BuildRepositoryContext(db *gorm.DB, logger promtail.Client) *RepositoryContext {
 	return &RepositoryContext{
-		HistoryRepo: repository.NewHistoryRepository(db),
+		HistoryRepo: repository.NewHistoryRepository(db, logger),
 	}
 }
 

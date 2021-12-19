@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/afiskon/promtail-client/promtail"
 	"github.com/opentracing/opentracing-go"
+	"github.com/rusrafkasimov/history/internal/trace"
 	"github.com/rusrafkasimov/history/pkg/models"
 	"gorm.io/gorm"
 )
@@ -16,11 +18,13 @@ type HistoryRepository interface {
 }
 
 type HistoryRepo struct {
+	logger promtail.Client
 	db *gorm.DB
 }
 
-func NewHistoryRepository(db *gorm.DB) *HistoryRepo {
+func NewHistoryRepository(db *gorm.DB, logger promtail.Client) *HistoryRepo {
 	return &HistoryRepo{
+		logger: logger,
 		db: db,
 	}
 }
@@ -32,6 +36,7 @@ func (hc *HistoryRepo) CreateAccountHistory(ctx context.Context, history models.
 
 	err := hc.db.Model(models.AccountHistory{}).Create(history).Error
 	if err != nil {
+		trace.OnError(hc.logger, repoSpan, err)
 		return fmt.Errorf("can't create history: %w", err)
 	}
 
@@ -47,6 +52,7 @@ func (hc *HistoryRepo) GetAccountHistoryByID(ctx context.Context, id string, spa
 
 	res := hc.db.Model(models.AccountHistory{}).Where("id = ?", id).Find(&history)
 	if res.Error != nil {
+		trace.OnError(hc.logger, repoSpan, res.Error)
 		return history, fmt.Errorf("can't get history by id: %w", res.Error)
 	}
 
@@ -62,6 +68,7 @@ func (hc *HistoryRepo) GetAccountHistoryByOperationID(ctx context.Context, id st
 
 	res := hc.db.Model(models.AccountHistory{}).Where("operation_id = ?", id).Find(&history)
 	if res.Error != nil {
+		trace.OnError(hc.logger, repoSpan, res.Error)
 		return history, fmt.Errorf("can't get history by operation id: %w", res.Error)
 	}
 
@@ -77,6 +84,7 @@ func (hc *HistoryRepo) GetAccountHistoryByClientID(ctx context.Context, cid stri
 
 	res := hc.db.Model(models.AccountHistory{}).Where("client_id = ?", cid).Find(&history)
 	if res.Error != nil {
+		trace.OnError(hc.logger, repoSpan, res.Error)
 		return history, fmt.Errorf("can't get history by client id: %w", res.Error)
 	}
 
